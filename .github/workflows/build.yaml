@@ -1,4 +1,3 @@
-
 name: CI
 
 on:
@@ -37,7 +36,9 @@ jobs:
       - name: Install SonarScanner
         run: |
           curl -o sonar-scanner.zip -L https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/4.6.2.2472/sonar-scanner-cli-4.6.2.2472-linux.zip
+          if [ $? -ne 0 ]; then echo "Failed to download SonarScanner"; exit 1; fi
           unzip sonar-scanner.zip -d sonar-scanner
+          if [ $? -ne 0 ]; then echo "Failed to unzip SonarScanner"; exit 1; fi
           echo "${{ github.workspace }}/sonar-scanner/sonar-scanner-4.6.2.2472-linux/bin" >> $GITHUB_PATH
 
       - name: Run SonarScanner
