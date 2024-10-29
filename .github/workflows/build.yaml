@@ -1,26 +1,15 @@
+
 name: CI
 
 on:
   push:
-    branches: ["main"]
+    branches: [ "main" ]
   pull_request:
-    branches: ["main"]
+    branches: [ "main" ]
 
 jobs:
   test:
     runs-on: ubuntu-latest
-
-    services:
-      sonarqube:
-        image: sonarqube:latest
-        ports:
-          - 9000:9000
-        options: >-
-          --health-cmd="curl -f http://localhost:9000/api/system/health || exit 1"
-          --health-interval=30s
-          --health-timeout=5s
-          --health-retries=5
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -47,23 +36,16 @@ jobs:
 
       - name: Install SonarScanner
         run: |
-          curl -L -o sonar-scanner.zip https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/4.6.2.2472/sonar-scanner-cli-4.6.2.2472-linux.zip
+          curl -o sonar-scanner.zip -L https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/4.6.2.2472/sonar-scanner-cli-4.6.2.2472-linux.zip
           unzip sonar-scanner.zip -d sonar-scanner
           echo "${{ github.workspace }}/sonar-scanner/sonar-scanner-4.6.2.2472-linux/bin" >> $GITHUB_PATH
-
-      - name: Wait for SonarQube to be ready
-        run: |
-          while ! curl -s http://localhost:9000/api/system/health | grep -q '"status":"UP"'; do
-            echo "Waiting for SonarQube..."
-            sleep 10
-          done
 
       - name: Run SonarScanner
         run: |
           sonar-scanner \
             -Dsonar.projectKey=demo-jazzx \
             -Dsonar.sources=. \
-            -Dsonar.host.url=http://localhost:9000 \
+            -Dsonar.host.url=http://172.210.15.27:9000 \
             -Dsonar.login=${{ secrets.SONAR_TOKEN }}
 
       - name: Upload coverage report to SonarQube
@@ -73,4 +55,4 @@ jobs:
           curl -X POST -u $SONAR_TOKEN: \
             -F projectKey=demo-jazzx \
             -F file=@coverage.xml \
-            http://localhost:9000/api/coverage/upload
+            http://172.210.15.27:9000/api/coverage/upload
