@@ -26,7 +26,21 @@ jobs:
       - name: Run tests with coverage
         run: |
           pytest --cov=app --cov-report=xml
-
+          
+      - name: Install SonarScanner
+        run: |
+          # Install necessary packages
+          sudo apt-get update
+          sudo apt-get install -y unzip wget
+          
+          # Download and install SonarScanner
+          wget https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.6.2.2472-linux.zip
+          unzip sonar-scanner-cli-4.6.2.2472-linux.zip
+          sudo mv sonar-scanner-4.6.2.2472-linux /opt/sonar-scanner
+          
+          # Add SonarScanner to PATH
+          echo 'export PATH=$PATH:/opt/sonar-scanner/bin' >> $GITHUB_ENV
+          
       - name: Install SonarScanner
         run: |
           sudo apt-get update
